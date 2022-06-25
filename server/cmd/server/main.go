@@ -34,17 +34,17 @@ func main() {
 	signal.Notify(sigChan, os.Interrupt, syscall.SIGTERM)
 	go func() {
 		<-sigChan
-		log.Println("stopping server...")
+		log.Println("stopping...")
 		cancel()
 		grpcServer.GracefulStop()
 	}()
 
-	log.Println("starting server...")
+	log.Println("serving...")
 
 	err = grpcServer.Serve(l)
 
 	if err != nil {
 		log.Fatalf("failed to serve: %v", err)
 	}
-	log.Println("server stopped")
+	log.Println("stopped")
 }

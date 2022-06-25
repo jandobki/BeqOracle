@@ -152,7 +152,7 @@ func TestGetAnswerDeleted(t *testing.T) {
 	}
 }
 
-func TestGetAnswerHistoryAll(t *testing.T) {
+func TestListEventsAll(t *testing.T) {
 	service := Service{
 		store: event.NewInitializedMemoryStore(
 			[]event.Event{
@@ -162,24 +162,24 @@ func TestGetAnswerHistoryAll(t *testing.T) {
 		),
 	}
 
-	e, to, err := service.GetAnswerHistory(context.Background(), "testkey", 0, 10)
+	e, to, err := service.ListEvents(context.Background(), "testkey", 0, 10)
 	if err != nil {
-		t.Fatalf("GetAnswerHistory(...\"testkey\"...) failed")
+		t.Fatalf("ListEvents(...\"testkey\"...) failed")
 	}
 	if len(e) != 2 {
-		t.Fatalf("GetAnswerHistory(...\"testkey\"...) returned wrong number of events")
+		t.Fatalf("ListEvents(...\"testkey\"...) returned wrong number of events")
 	}
 	if to != 0 {
-		t.Fatalf("GetAnswerHistory(...\"testkey\"...) returned paging token while returning all")
+		t.Fatalf("ListEvents(...\"testkey\"...) returned paging token while returning all")
 	}
 	if e[0].Event != string(event.EventTypeCreate) ||
 		e[0].Value != "testvalue1" ||
 		e[1].Event != string(event.EventTypeDelete) {
-		t.Fatalf("GetAnswerHistory(...\"testkey\"...) returned wrong data")
+		t.Fatalf("ListEvents(...\"testkey\"...) returned wrong data")
 	}
 }
 
-func TestGetAnswerHistoryPaged(t *testing.T) {
+func TestListEventsPaged(t *testing.T) {
 	service := Service{
 		store: event.NewInitializedMemoryStore(
 			[]event.Event{
@@ -193,48 +193,48 @@ func TestGetAnswerHistoryPaged(t *testing.T) {
 		),
 	}
 
-	e, to, err := service.GetAnswerHistory(context.Background(), "testkey", 0, 2)
+	e, to, err := service.ListEvents(context.Background(), "testkey", 0, 2)
 	if err != nil {
-		t.Fatalf("GetAnswerHistory(...\"testkey\"...) failed")
+		t.Fatalf("ListEvents(...\"testkey\"...) failed")
 	}
 	if len(e) != 2 {
-		t.Fatalf("GetAnswerHistory(...\"testkey\"...) returned wrong number of events")
+		t.Fatalf("ListEvents(...\"testkey\"...) returned wrong number of events")
 	}
 	if to == 0 {
-		t.Fatalf("GetAnswerHistory(...\"testkey\"...) returned zero paging token while returning part")
+		t.Fatalf("ListEvents(...\"testkey\"...) returned zero paging token while returning part")
 	}
 	if e[0].Event != string(event.EventTypeCreate) ||
 		e[0].Value != "testvalue1" {
-		t.Fatalf("GetAnswerHistory(...\"testkey\"...) returned wrong data")
+		t.Fatalf("ListEvents(...\"testkey\"...) returned wrong data")
 	}
 
-	e, to, err = service.GetAnswerHistory(context.Background(), "testkey", to, 2)
+	e, to, err = service.ListEvents(context.Background(), "testkey", to, 2)
 	if err != nil {
-		t.Fatalf("GetAnswerHistory(...\"testkey\"...) 2nd page failed")
+		t.Fatalf("ListEvents(...\"testkey\"...) 2nd page failed")
 	}
 	if len(e) != 2 {
-		t.Fatalf("GetAnswerHistory(...\"testkey\"...) 2nd page returned wrong number of events")
+		t.Fatalf("ListEvents(...\"testkey\"...) 2nd page returned wrong number of events")
 	}
 	if to == 0 {
-		t.Fatalf("GetAnswerHistory(...\"testkey\"...) 2nd page returned zero paging token while returning part")
+		t.Fatalf("ListEvents(...\"testkey\"...) 2nd page returned zero paging token while returning part")
 	}
 	if e[0].Event != string(event.EventTypeUpdate) ||
 		e[0].Value != "testvalue3" {
-		t.Fatalf("GetAnswerHistory(...\"testkey\"...) 2nd page returned wrong data")
+		t.Fatalf("ListEvents(...\"testkey\"...) 2nd page returned wrong data")
 	}
 
-	e, to, err = service.GetAnswerHistory(context.Background(), "testkey", to, 2)
+	e, to, err = service.ListEvents(context.Background(), "testkey", to, 2)
 	if err != nil {
-		t.Fatalf("GetAnswerHistory(...\"testkey\"...) 3rd page failed")
+		t.Fatalf("ListEvents(...\"testkey\"...) 3rd page failed")
 	}
 	if len(e) != 2 {
-		t.Fatalf("GetAnswerHistory(...\"testkey\"...) 3rd page returned wrong number of events")
+		t.Fatalf("ListEvents(...\"testkey\"...) 3rd page returned wrong number of events")
 	}
 	if to != 0 {
-		t.Fatalf("GetAnswerHistory(...\"testkey\"...) 3rd page returned paging token while it's the last page")
+		t.Fatalf("ListEvents(...\"testkey\"...) 3rd page returned paging token while it's the last page")
 	}
 	if e[0].Event != string(event.EventTypeUpdate) ||
 		e[0].Value != "testvalue5" {
-		t.Fatalf("GetAnswerHistory(...\"testkey\"...) 3rd page returned wrong data")
+		t.Fatalf("ListEvents(...\"testkey\"...) 3rd page returned wrong data")
 	}
 }

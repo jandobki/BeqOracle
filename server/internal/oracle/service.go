@@ -26,7 +26,7 @@ func (s *Service) CreateAnswer(ctx context.Context, key, value string) error {
 	}
 
 	if ev.Event != event.EventTypeEmpty && ev.Event != event.EventTypeDelete {
-		return fmt.Errorf("already exists")
+		return ErrAlreadyExists
 	}
 
 	err = s.store.AddEvent(ctx, event.Event{
@@ -49,7 +49,7 @@ func (s *Service) UpdateAnswer(ctx context.Context, key, value string) error {
 	}
 
 	if ev.Event != event.EventTypeCreate && ev.Event != event.EventTypeUpdate {
-		return fmt.Errorf("doesn't exist")
+		return ErrNotFound
 	}
 
 	err = s.store.AddEvent(ctx, event.Event{
@@ -72,7 +72,7 @@ func (s *Service) GetAnswer(ctx context.Context, key string) (string, error) {
 	}
 
 	if ev.Event != event.EventTypeCreate && ev.Event != event.EventTypeUpdate {
-		return "", fmt.Errorf("doesn't exist")
+		return "", ErrNotFound
 	}
 
 	return ev.Data, nil
@@ -85,7 +85,7 @@ func (s *Service) DeleteAnswer(ctx context.Context, key string) error {
 	}
 
 	if ev.Event != event.EventTypeCreate && ev.Event != event.EventTypeUpdate {
-		return fmt.Errorf("doesn't exist")
+		return ErrNotFound
 	}
 
 	err = s.store.AddEvent(ctx, event.Event{
@@ -106,7 +106,7 @@ type Event struct {
 	Value string
 }
 
-func (s *Service) GetAnswerHistory(ctx context.Context, key string, from, count int) ([]Event, int, error) {
+func (s *Service) ListEvents(ctx context.Context, key string, from, count int) ([]Event, int, error) {
 	stored, to, err := s.store.GetEventsByKey(ctx, key, from, count)
 	if err != nil {
 		return nil, 0, fmt.Errorf("can't retrieve history: %v", err)

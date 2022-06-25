@@ -94,32 +94,42 @@ const selectLastQuery = `SELECT "event", "value" FROM public.events WHERE "key" 
 func (s *PgStore) GetLastEventByKey(ctx context.Context, key string) (Event, error) {
 	var event, value string
 	err := s.db.QueryRowContext(ctx, selectLastQuery, key).Scan(&event, &value)
-	if err != nil {
+	if err != nil && err != sql.ErrNoRows {
 		return Event{}, err
 	}
 
 	return Event{Event: EventType(event), Key: key, Data: value}, nil
 }
 
-const selectAllQuery = `SELECT "event", "value" FROM public.events WHERE "id" >= $2 AND "key" = $1 ORDER BY "id" LIMIT $3`
+const selectAllQuery = `SELECT "id", "event", "value" FROM public.events WHERE "id" >= $2 AND "key" = $1 ORDER BY "id" LIMIT $3`
+const pgMaxPageSize = 100
 
 func (s *PgStore) GetEventsByKey(ctx context.Context, key string, from, count int) ([]Event, int, error) {
+	if count > pgMaxPageSize {
+		count = pgMaxPageSize
+	}
 	res := make([]Event, 0, count)
 
-	rows, err := s.db.QueryContext(ctx, selectAllQuery, key, from, count)
+	rows, err := s.db.QueryContext(ctx, selectAllQuery, key, from, count+1)
 	if err != nil {
 		return nil, 0, err
 	}
 	defer rows.Close()
 
-	for rows.Next() {
+	next_id := 0
+	for i := 0; rows.Next(); i++ {
+		var id int
 		var event, value string
-		rows.Scan(&event, &value)
+		rows.Scan(&id, &event, &value)
+		if i >= count {
+			next_id = id
+			break
+		}
 		res = append(res, Event{
 			Event: EventType(event),
 			Key:   key,
 			Data:  value})
 	}
 
-	return res, 0, nil
+	return res, next_id, nil
 }

@@ -32,7 +32,12 @@ func (s *MemoryStore) GetLastEventByKey(ctx context.Context, key string) (Event,
 	return Event{}, nil
 }
 
+const memMaxPageSize = 100
+
 func (s *MemoryStore) GetEventsByKey(ctx context.Context, key string, from, count int) ([]Event, int, error) {
+	if count > memMaxPageSize {
+		count = memMaxPageSize
+	}
 	res := make([]Event, 0, count)
 
 	for i := from; i < len(s.events); i++ {
