@@ -3,44 +3,24 @@ package event
 import (
 	"context"
 	"database/sql"
-	"errors"
 	"fmt"
 	"log"
+	"os"
 
-	_ "embed"
-
-	pq "github.com/lib/pq"
+	_ "github.com/lib/pq"
 )
 
 type PgStore struct {
 	db *sql.DB
 }
 
-func CreateDB(ctx context.Context, dbName string) error {
-	psqlInfo := "host=localhost port=5432 user=postgres password=postgres sslmode=disable"
+func getPsqlInfo() string {
+	host := os.Getenv("POSTGRES_HOST")
+	db := os.Getenv("POSTGRES_DB")
+	user := os.Getenv("POSTGRES_USER")
+	password := os.Getenv("POSTGRES_PASSWORD")
 
-	log.Print("creating database... ")
-
-	db, err := sql.Open("postgres", psqlInfo)
-	if err != nil {
-		return err
-	}
-	defer db.Close()
-
-	_, err = db.ExecContext(ctx, fmt.Sprintf("CREATE DATABASE \"%s\"", dbName))
-	if err != nil {
-		var sqlErr *pq.Error
-		errors.As(err, &sqlErr)
-		if sqlErr.Code == "42P04" {
-			log.Println("already exists")
-			return nil
-		}
-
-		return err
-	}
-
-	log.Println("created")
-	return nil
+	return fmt.Sprintf("host=%s port=5432 user=%s password=%s sslmode=disable database=%s", host, user, password, db)
 }
 
 const initQuery = `
@@ -52,11 +32,9 @@ CREATE TABLE IF NOT EXISTS events (
 )`
 
 func InitDB(ctx context.Context, dbName string) error {
-	psqlInfo := "host=localhost port=5432 user=postgres password=postgres sslmode=disable database=" + dbName
-
 	log.Print("initializing database... ")
 
-	db, err := sql.Open("postgres", psqlInfo)
+	db, err := sql.Open("postgres", getPsqlInfo())
 	if err != nil {
 		return err
 	}
@@ -68,9 +46,7 @@ func InitDB(ctx context.Context, dbName string) error {
 }
 
 func NewPqStore() (*PgStore, error) {
-	psqlInfo := "host=localhost port=5432 user=postgres password=postgres sslmode=disable database=beqoracle"
-
-	db, err := sql.Open("postgres", psqlInfo)
+	db, err := sql.Open("postgres", getPsqlInfo())
 
 	if err != nil {
 		return nil, err

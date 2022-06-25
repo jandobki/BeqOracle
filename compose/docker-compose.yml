@@ -6,7 +6,7 @@ services:
     ports:
       - "5432:5432"    
     environment:
-      - POSTGRES_DB=postgres
+      - POSTGRES_DB=beqoracle
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
   server:
@@ -16,6 +16,7 @@ services:
     depends_on:
       - db
     environment:
-      - POSTGRES_DB=postgres
+      - POSTGRES_HOST=db
+      - POSTGRES_DB=beqoracle
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres

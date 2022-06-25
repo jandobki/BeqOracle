@@ -18,7 +18,6 @@ func main() {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	event.CreateDB(ctx, "beqoracle")
 	event.InitDB(ctx, "beqoracle")
 
 	l, err := net.Listen("tcp", ":5000")
