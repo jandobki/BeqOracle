@@ -12,8 +12,10 @@ type Service struct {
 }
 
 func NewService() *Service {
+	store, _ := event.NewPqStore()
+
 	return &Service{
-		store: &event.MemoryStore{},
+		store: store,
 	}
 }
 

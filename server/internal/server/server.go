@@ -2,7 +2,6 @@ package server
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/golang/protobuf/ptypes/empty"
 	pb "github.com/jandobki/beqoracle/server/internal/model"
@@ -14,7 +13,7 @@ type beqOracleServer struct {
 	service *oracle.Service
 }
 
-func NewServer() *beqOracleServer {
+func NewServer(ctx context.Context) *beqOracleServer {
 	return &beqOracleServer{
 		service: oracle.NewService(),
 	}
@@ -65,6 +64,22 @@ func (s *beqOracleServer) DeleteAnswer(ctx context.Context, req *pb.DeleteAnswer
 	return &empty.Empty{}, nil
 }
 
-func (s *beqOracleServer) GetAnswerHistory(context.Context, *pb.GetAnswerHistoryRequest) (*pb.EventList, error) {
-	return nil, fmt.Errorf("not implemented")
+func (s *beqOracleServer) GetAnswerHistory(ctx context.Context, req *pb.GetAnswerHistoryRequest) (*pb.EventList, error) {
+	evs, to, err := s.service.GetAnswerHistory(ctx, req.Key, int(req.PageNubmer), int(req.PageSize))
+	if err != nil {
+		return nil, err
+	}
+
+	res := make([]*pb.Event, len(evs))
+	for i, e := range evs {
+		res[i] = &pb.Event{
+			Event: e.Event,
+			Data:  &pb.Answer{Key: req.Key, Value: e.Value},
+		}
+	}
+
+	return &pb.EventList{
+		Events:         res,
+		NextPageNumber: int32(to),
+	}, nil
 }
