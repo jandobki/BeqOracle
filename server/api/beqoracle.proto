@@ -1,0 +1,58 @@
+syntax = "proto3";
+
+package model;
+
+import "google/protobuf/empty.proto";
+
+option go_package = "github.com/jandobki/beqoracle/server/internal/model";
+
+
+service BeqOracle {
+    rpc CreateAnswer(CreateAnswerRequest) returns (Answer) {}
+    rpc UpdateAnswer(UpdateAnswerRequest) returns (Answer) {}
+    rpc GetAnswer(GetAnswerRequest) returns (Answer) {}
+    rpc DeleteAnswer(DeleteAnswerRequest) returns (google.protobuf.Empty) {}
+    rpc GetAnswerHistory(GetAnswerHistoryRequest) returns (EventList) {}
+
+}
+
+message Answer {
+    string key = 1;
+    string value = 2;
+}
+
+message Event {
+    string event = 1;
+    Answer data = 2;
+}
+
+message CreateAnswerRequest {
+    string key = 1;
+    string value = 2;
+}
+
+message UpdateAnswerRequest {
+    string key = 1;
+    string value = 2;
+}
+
+message GetAnswerRequest {
+    string key = 1;
+}
+
+message DeleteAnswerRequest {
+    string key = 1;
+}
+
+message GetAnswerHistoryRequest {
+    string key = 1;
+
+    int32 page_size = 2;
+    int32 page_nubmer = 3;
+}
+
+message EventList {
+    repeated Event events = 1;
+
+    int32 next_page_number = 2;
+}
