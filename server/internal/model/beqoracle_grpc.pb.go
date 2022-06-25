@@ -27,7 +27,7 @@ type BeqOracleClient interface {
 	UpdateAnswer(ctx context.Context, in *UpdateAnswerRequest, opts ...grpc.CallOption) (*Answer, error)
 	GetAnswer(ctx context.Context, in *GetAnswerRequest, opts ...grpc.CallOption) (*Answer, error)
 	DeleteAnswer(ctx context.Context, in *DeleteAnswerRequest, opts ...grpc.CallOption) (*empty.Empty, error)
-	GetAnswerHistory(ctx context.Context, in *GetAnswerHistoryRequest, opts ...grpc.CallOption) (*EventList, error)
+	ListEvents(ctx context.Context, in *ListEventsRequest, opts ...grpc.CallOption) (*EventList, error)
 }
 
 type beqOracleClient struct {
@@ -74,9 +74,9 @@ func (c *beqOracleClient) DeleteAnswer(ctx context.Context, in *DeleteAnswerRequ
 	return out, nil
 }
 
-func (c *beqOracleClient) GetAnswerHistory(ctx context.Context, in *GetAnswerHistoryRequest, opts ...grpc.CallOption) (*EventList, error) {
+func (c *beqOracleClient) ListEvents(ctx context.Context, in *ListEventsRequest, opts ...grpc.CallOption) (*EventList, error) {
 	out := new(EventList)
-	err := c.cc.Invoke(ctx, "/model.BeqOracle/GetAnswerHistory", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/model.BeqOracle/ListEvents", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -91,7 +91,7 @@ type BeqOracleServer interface {
 	UpdateAnswer(context.Context, *UpdateAnswerRequest) (*Answer, error)
 	GetAnswer(context.Context, *GetAnswerRequest) (*Answer, error)
 	DeleteAnswer(context.Context, *DeleteAnswerRequest) (*empty.Empty, error)
-	GetAnswerHistory(context.Context, *GetAnswerHistoryRequest) (*EventList, error)
+	ListEvents(context.Context, *ListEventsRequest) (*EventList, error)
 	mustEmbedUnimplementedBeqOracleServer()
 }
 
@@ -111,8 +111,8 @@ func (UnimplementedBeqOracleServer) GetAnswer(context.Context, *GetAnswerRequest
 func (UnimplementedBeqOracleServer) DeleteAnswer(context.Context, *DeleteAnswerRequest) (*empty.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteAnswer not implemented")
 }
-func (UnimplementedBeqOracleServer) GetAnswerHistory(context.Context, *GetAnswerHistoryRequest) (*EventList, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetAnswerHistory not implemented")
+func (UnimplementedBeqOracleServer) ListEvents(context.Context, *ListEventsRequest) (*EventList, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListEvents not implemented")
 }
 func (UnimplementedBeqOracleServer) mustEmbedUnimplementedBeqOracleServer() {}
 
@@ -199,20 +199,20 @@ func _BeqOracle_DeleteAnswer_Handler(srv interface{}, ctx context.Context, dec f
 	return interceptor(ctx, in, info, handler)
 }
 
-func _BeqOracle_GetAnswerHistory_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetAnswerHistoryRequest)
+func _BeqOracle_ListEvents_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListEventsRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(BeqOracleServer).GetAnswerHistory(ctx, in)
+		return srv.(BeqOracleServer).ListEvents(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/model.BeqOracle/GetAnswerHistory",
+		FullMethod: "/model.BeqOracle/ListEvents",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(BeqOracleServer).GetAnswerHistory(ctx, req.(*GetAnswerHistoryRequest))
+		return srv.(BeqOracleServer).ListEvents(ctx, req.(*ListEventsRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -241,8 +241,8 @@ var BeqOracle_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _BeqOracle_DeleteAnswer_Handler,
 		},
 		{
-			MethodName: "GetAnswerHistory",
-			Handler:    _BeqOracle_GetAnswerHistory_Handler,
+			MethodName: "ListEvents",
+			Handler:    _BeqOracle_ListEvents_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

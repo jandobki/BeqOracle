@@ -64,8 +64,8 @@ func (s *beqOracleServer) DeleteAnswer(ctx context.Context, req *pb.DeleteAnswer
 	return &empty.Empty{}, nil
 }
 
-func (s *beqOracleServer) GetAnswerHistory(ctx context.Context, req *pb.GetAnswerHistoryRequest) (*pb.EventList, error) {
-	evs, to, err := s.service.GetAnswerHistory(ctx, req.Key, int(req.PageNubmer), int(req.PageSize))
+func (s *beqOracleServer) ListEvents(ctx context.Context, req *pb.ListEventsRequest) (*pb.EventList, error) {
+	evs, to, err := s.service.GetAnswerHistory(ctx, req.Key, int(req.PageToken), int(req.PageSize))
 	if err != nil {
 		return nil, err
 	}
@@ -79,7 +79,7 @@ func (s *beqOracleServer) GetAnswerHistory(ctx context.Context, req *pb.GetAnswe
 	}
 
 	return &pb.EventList{
-		Events:         res,
-		NextPageNumber: int32(to),
+		Events:        res,
+		NextPageToken: int32(to),
 	}, nil
 }
