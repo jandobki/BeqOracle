@@ -12,6 +12,7 @@ import (
 	pb "github.com/jandobki/beqoracle/server/internal/model"
 	"github.com/jandobki/beqoracle/server/internal/server"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/reflection"
 )
 
 func main() {
@@ -28,6 +29,7 @@ func main() {
 	var opts []grpc.ServerOption
 	grpcServer := grpc.NewServer(opts...)
 	pb.RegisterBeqOracleServer(grpcServer, server.NewServer(ctx))
+	reflection.Register(grpcServer)
 
 	sigChan := make(chan os.Signal, 1)
 	signal.Notify(sigChan, os.Interrupt, syscall.SIGTERM)
