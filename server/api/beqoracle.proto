@@ -47,12 +47,16 @@ message DeleteAnswerRequest {
 message ListEventsRequest {
     string key = 1;
 
+    // Required. Zero means zero results returned.
     int32 page_size = 2;
+    
     int32 page_token = 3;
 }
 
 message EventList {
     repeated Event events = 1;
 
+    /// If not zero, pass it to the requests page_token 
+    /// to receive next page.
     int32 next_page_token = 2;
 }
